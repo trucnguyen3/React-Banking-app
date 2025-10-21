@@ -1,0 +1,124 @@
+{
+  "project_info": {
+    "project_number": "822761089009",
+    "project_id": "akastore-project",
+    "storage_bucket": "akastore-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822761089009:android:d5a50f88fe6072d6e10650",
+        "android_client_info": {
+          "package_name": "aka.digital.cgv_demo_v2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsRDiWpDsupwC7vSrmQuX3ZlPU_QPweAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822761089009:android:bf4b0284fc878937e10650",
+        "android_client_info": {
+          "package_name": "com.aka_appsflyer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsRDiWpDsupwC7vSrmQuX3ZlPU_QPweAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822761089009:android:2539964c09e2f9a1e10650",
+        "android_client_info": {
+          "package_name": "com.aka_banking"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsRDiWpDsupwC7vSrmQuX3ZlPU_QPweAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822761089009:android:8c6ad21455a18ff6e10650",
+        "android_client_info": {
+          "package_name": "com.example.tuoitre"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsRDiWpDsupwC7vSrmQuX3ZlPU_QPweAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822761089009:android:8e2da8dd2f5b0680e10650",
+        "android_client_info": {
+          "package_name": "com.fptplay_demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsRDiWpDsupwC7vSrmQuX3ZlPU_QPweAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822761089009:android:87964468bc5c171fe10650",
+        "android_client_info": {
+          "package_name": "com.jollibee_cee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsRDiWpDsupwC7vSrmQuX3ZlPU_QPweAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
