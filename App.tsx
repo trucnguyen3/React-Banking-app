@@ -86,8 +86,8 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
     appsFlyer.initSdk(
       {
         devKey: 'cYmtVpJCBSET23rRv4GWXa',
-        isDebug: false,
-        appId: '',
+        isDebug: true,
+        appId: '6754323492',
         onInstallConversionDataListener: true,
         onDeepLinkListener: true,
         timeToWaitForATTUserAuthorization: 10,
