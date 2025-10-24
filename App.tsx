@@ -133,39 +133,38 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
 
        appsFlyer.onInstallConversionData((res) => {
                console.log("AKA TEST CONVER: ", res)
-               if (res?.data) {
-                   if (res?.data.deep_link_value) {
-                        const referralCode = res.data.referral_code || '';
-                        const referralUserId = res.data.af_referrer_customer_id || '';
+               if (res?.data.deep_link_value) {
+                    const referralCode = res.data.referral_code || '';
+                    const referralUserId = res.data.af_referrer_customer_id || '';
 
-                        setReferralCodeOnInstall(referralCode);
-                        setReferralUserIdOnInstall(referralUserId);
+                    setReferralCodeOnInstall(referralCode);
+                    setReferralUserIdOnInstall(referralUserId);
 
-                        console.log('Install referralCode:', referralCode);
-                        console.log('Install referralUserId:', referralUserId);
+                    console.log('Install referralCode:', referralCode);
+                    console.log('Install referralUserId:', referralUserId);
 
-                        navigation.navigate(res.data.deep_link_value, {
-                          referralCodeOnInstall: referralCode,
-                          referralUserIdOnInstall: referralUserId,
-                        });
+                    navigation.navigate("SignupScreen", {
+                      referralCodeOnInstall: referralCode,
+                      referralUserIdOnInstall: referralUserId,
+                    });
 
-                       const data_source_install = {
-                           SOURCE: res.data.media_source,
-                           CUSTOMER_TYPE: res.data.retargeting_conversion_type
-                       };
-                   }
+                   const data_source_install = {
+                       SOURCE: res.data.media_source,
+                       CUSTOMER_TYPE: res.data.retargeting_conversion_type
+                   };
                }
           });
 
-      const handleDeepLink = ({ url }) => {
-          console.log('Received deep link outside:', url);
-            // You can route based on the URL
-          if (url.includes('SignupScreen')) {
-              // navigate to a screen
-              console.log('Received deep link inside:', url);
-              navigation.navigate(url)
-          }
-      };
+            const handleDeepLink = ({ url }) => {
+              console.log('Received deep link outside:', url);
+              if (url.includes('SignupScreen')) {
+                console.log('Received deep link inside:', url);
+                navigation.navigate('SignupScreen', {
+                  referralCodeOnDeeplink,
+                  referralUserIdOnDeeplink,
+                });
+              }
+            };
 
            useEffect(() => {
              Linking.getInitialURL().then((url) => {
@@ -178,7 +177,10 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                console.log('Opened with URL:', url);
                // Parse and navigate
                if (url.includes('SignupScreen')) {
-                 navigation.navigate('SignupScreen');
+                navigation.navigate('SignupScreen', {
+                  referralCodeOnDeeplink,
+                  referralUserIdOnDeeplink,
+                });
                }
              };
 
@@ -190,7 +192,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                listener.remove();
              };
            }, []);
-
+    
         const onDeepLink = (data: any) => {
           console.log('Deep Link Data:', data);
 
@@ -204,7 +206,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
             console.log('Navigating with referralCode:', referralCode);
             console.log('Navigating with referralUserId:', referralUserId);
 
-            navigation.navigate(data.data.deep_link_value, {
+            navigation.navigate("SignupScreen", {
               referralCodeOnDeeplink: referralCode,
               referralUserIdOnDeeplink: referralUserId,
             });
@@ -271,10 +273,10 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
   );
 }
 
-const SignupScreen: React.FC<{ route: any,  navigation: any }> = ({ route, navigation }) => {
+const SignupScreen: React.FC<{ route: any,  navigation: any }> = ({ route, navigation, onSignup }) => {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('tructest@gmail.com');
+  const [password, setPassword] = useState('123');
 
   const referralCodeOnInstall = route.params?.referralCodeOnInstall || '';
   const referralUserIdOnInstall = route.params?.referralUserIdOnInstall || '';
@@ -328,6 +330,18 @@ const SignupScreen: React.FC<{ route: any,  navigation: any }> = ({ route, navig
       } else {
         Alert.alert('Signup', 'Pretend signup successful (pass a real onSignup prop).');
       }
+
+      appsFlyer.setCustomerUserId(name, (res) => {
+        console.log('AppsFlyer ' + name + ' set:', res);
+      });
+
+      navigation.reset({
+        index: 0,
+        routes: [{
+            name: 'HomeScreen' ,
+            params: { name }
+        }],
+      });
     } catch (e) {
       Alert.alert('Signup failed', e?.message || 'Unknown error');
     }
@@ -426,7 +440,8 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
     }
   };
 
-  const { identifier } = route.params || {};
+  const { identifier, name } = route.params || {};
+  const displayUser = identifier || name || "Guest";
 
           const eventName = 'af_homescreen';
           const eventValues = {
@@ -451,7 +466,7 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
         <ScrollView contentInsetAdjustmentBehavior="automatic" style={backgroundStyle}>
           <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Welcome, {identifier}</Text>
+            <Text style={styles.sectionTitle}>Welcome, {displayUser}!</Text>
             <View style={tw`mb-3`}>
               <Button
                 title="Logout"
