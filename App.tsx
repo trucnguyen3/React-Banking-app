@@ -166,7 +166,6 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
               navigation.navigate(url)
           }
       };
-    /*
 
            useEffect(() => {
              Linking.getInitialURL().then((url) => {
@@ -191,7 +190,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                listener.remove();
              };
            }, []);
-    */
+
         const onDeepLink = (data: any) => {
           console.log('Deep Link Data:', data);
 
