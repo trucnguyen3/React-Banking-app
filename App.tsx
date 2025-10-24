@@ -478,13 +478,13 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
               <Button
                 title="Invite User"
                 onPress={() => {
-                    appsFlyer.setAppInviteOneLinkID('pXhX', null);
+                    appsFlyer.setAppInviteOneLinkID('HkUB', null);
 
                     // set the user invite params
                     appsFlyer.generateInviteLink(
                      {
-                       channel: 'AKA Mobile Application',
-                       campaign: 'AKA_Invite',
+                       channel: 'AKA Banking Application',
+                       campaign: 'AKA_Invite_App',
                        customerID: identifier,
                        brandDomain:'uat.akadigital.net',
                        baseDeepLink: 'aka://banking/SignupScreen',
