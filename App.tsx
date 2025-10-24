@@ -133,43 +133,39 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
 
        appsFlyer.onInstallConversionData((res) => {
                console.log("AKA TEST CONVER: ", res)
-               if (res?.data.deep_link_value) {
-                    const referralCode = res.data.referral_code || '';
-                    const referralUserId = res.data.af_referrer_customer_id || '';
+               if (res?.data) {
+                   if (res?.data.deep_link_value) {
+                        const referralCode = res.data.referral_code || '';
+                        const referralUserId = res.data.af_referrer_customer_id || '';
 
-                    setReferralCodeOnInstall(referralCode);
-                    setReferralUserIdOnInstall(referralUserId);
+                        setReferralCodeOnInstall(referralCode);
+                        setReferralUserIdOnInstall(referralUserId);
 
-                    console.log('Install referralCode:', referralCode);
-                    console.log('Install referralUserId:', referralUserId);
+                        console.log('Install referralCode:', referralCode);
+                        console.log('Install referralUserId:', referralUserId);
 
-                    navigation.navigate("SignupScreen", {
-                      referralCodeOnInstall: referralCode,
-                      referralUserIdOnInstall: referralUserId,
-                    });
+                        navigation.navigate(res.data.deep_link_value, {
+                          referralCodeOnInstall: referralCode,
+                          referralUserIdOnInstall: referralUserId,
+                        });
 
-                   const data_source_install = {
-                       SOURCE: res.data.media_source,
-                       CUSTOMER_TYPE: res.data.retargeting_conversion_type
-                   };
+                       const data_source_install = {
+                           SOURCE: res.data.media_source,
+                           CUSTOMER_TYPE: res.data.retargeting_conversion_type
+                       };
+                   }
                }
           });
 
-            const handleDeepLink = ({ url }) => {
-              console.log('Received deep link outside:', url);
-
-              // Ignore invalid or old cached URLs
-              if (!url || !url.startsWith('aka://')) return;
-
-              // Only handle when the deep link matches
-              if (url.includes('/SignupScreen')) {
-                console.log('Received deep link inside:', url);
-                navigation.navigate('SignupScreen', {
-                  referralCodeOnDeeplink,
-                  referralUserIdOnDeeplink,
-                });
-              }
-            };
+      const handleDeepLink = ({ url }) => {
+          console.log('Received deep link outside:', url);
+            // You can route based on the URL
+          if (url.includes('SignupScreen')) {
+              // navigate to a screen
+              console.log('Received deep link inside:', url);
+              navigation.navigate(url)
+          }
+      };
     /*
 
            useEffect(() => {
@@ -209,7 +205,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
             console.log('Navigating with referralCode:', referralCode);
             console.log('Navigating with referralUserId:', referralUserId);
 
-            navigation.navigate("SignupScreen", {
+            navigation.navigate(data.data.deep_link_value, {
               referralCodeOnDeeplink: referralCode,
               referralUserIdOnDeeplink: referralUserId,
             });
