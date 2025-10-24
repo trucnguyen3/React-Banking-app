@@ -54,6 +54,27 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('abc');
 
+    const [referralCodeOnInstall, setReferralCodeOnInstall] = useState('');
+    const [referralUserIdOnInstall, setReferralUserIdOnInstall] = useState('');
+
+    const [referralCodeOnDeeplink, setReferralCodeOnDeeplink] = useState('');
+    const [referralUserIdOnDeeplink, setReferralUserIdOnDeeplink] = useState('');
+
+       appsFlyer.initSdk(
+          {
+            devKey: 'cYmtVpJCBSET23rRv4GWXa',
+            isDebug: true,
+            appId: '6754323492',
+            onInstallConversionDataListener: true,
+            onDeepLinkListener: true,
+            //timeToWaitForATTUserAuthorization: 10,
+          },
+          (result) => {
+              console.log('AppsFlyer SDK initialized:', result)
+          },
+          (error) => console.error('AppsFlyer error:', error)
+        );
+
     const handleLogin = async () => {
       if (!identifier || !password) {
         Alert.alert('Error', 'Please enter both email/username and password');
@@ -66,34 +87,6 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
         } else {
           Alert.alert('Login', 'Pretend login successful (pass a real onLogin prop).');
         }
-
-        appsFlyer.setCustomerUserId(identifier, (res) => {
-          console.log('AppsFlyer ' + identifier + ' set:', res);
-        });
-
-        navigation.reset({
-          index: 0,
-          routes: [{
-              name: 'HomeScreen' ,
-              params: { identifier }
-          }],
-        });
-      } catch (e) {
-        Alert.alert('Login failed', e?.message || 'Unknown error');
-      }
-    };
-
-    appsFlyer.initSdk(
-      {
-        devKey: 'cYmtVpJCBSET23rRv4GWXa',
-        isDebug: true,
-        appId: '6754323492',
-        onInstallConversionDataListener: true,
-        onDeepLinkListener: true,
-        timeToWaitForATTUserAuthorization: 10,
-      },
-      (result) => {
-          console.log('AppsFlyer SDK initialized:', result)
 
           const eventName = 'af_loginscreen';
           const eventValues = {
@@ -112,84 +105,118 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
               console.error(err);
             }
           );
-      },
-      (error) => console.error('AppsFlyer error:', error)
-    );
 
-    const [referralCode, setReferralCode] = useState('');
+        appsFlyer.setCustomerUserId(identifier, (res) => {
+          console.log('AppsFlyer ' + identifier + ' set:', res);
+        });
 
-   appsFlyer.onInstallConversionDataListener = (conversionData) => {
-        console.log('Install Conversion Data:', conversionData);
-   };
+        navigation.reset({
+          index: 0,
+          routes: [{
+              name: 'HomeScreen' ,
+              params: { identifier }
+          }],
+        });
+      } catch (e) {
+        Alert.alert('Login failed', e?.message || 'Unknown error');
+      }
+    };
+       appsFlyer.onInstallConversionDataListener = (conversionData) => {
+            console.log('Install Conversion Data:', conversionData);
+       };
 
 
-   // Example for uninstall detection
-   appsFlyer.onUninstallListener = (uninstallData) => {
-        console.log('Uninstall Data:', uninstallData);
-   };
+       // Example for uninstall detection
+       appsFlyer.onUninstallListener = (uninstallData) => {
+            console.log('Uninstall Data:', uninstallData);
+       };
 
-   appsFlyer.onInstallConversionData((res) => {
-           console.log("AKA TEST CONVER: ", res)
-           if (res?.data) {
+       appsFlyer.onInstallConversionData((res) => {
+               console.log("AKA TEST CONVER: ", res)
                if (res?.data.deep_link_value) {
-                   navigation.navigate(res.data.deep_link_value)
+                    const referralCode = res.data.referral_code || '';
+                    const referralUserId = res.data.af_referrer_customer_id || '';
+
+                    setReferralCodeOnInstall(referralCode);
+                    setReferralUserIdOnInstall(referralUserId);
+
+                    console.log('Install referralCode:', referralCode);
+                    console.log('Install referralUserId:', referralUserId);
+
+                    navigation.navigate("SignupScreen", {
+                      referralCodeOnInstall: referralCode,
+                      referralUserIdOnInstall: referralUserId,
+                    });
+
+                   const data_source_install = {
+                       SOURCE: res.data.media_source,
+                       CUSTOMER_TYPE: res.data.retargeting_conversion_type
+                   };
                }
+          });
 
-               const data_source_install = {
-                   SOURCE: res.data.media_source,
-                   CUSTOMER_TYPE: res.data.retargeting_conversion_type
-               };
+            const handleDeepLink = ({ url }) => {
+              console.log('Received deep link outside:', url);
 
-               if (res.data.referral_code) {
-                 console.log('Referral Code:', res.data.referral_code);
-                 setReferralCode(res.data.referral_code);
+              // Ignore invalid or old cached URLs
+              if (!url || !url.startsWith('aka://')) return;
+
+              // Only handle when the deep link matches
+              if (url.includes('/SignupScreen')) {
+                console.log('Received deep link inside:', url);
+                navigation.navigate('SignupScreen', {
+                  referralCodeOnDeeplink,
+                  referralUserIdOnDeeplink,
+                });
+              }
+            };
+    /*
+
+           useEffect(() => {
+             Linking.getInitialURL().then((url) => {
+               if (url) {
+                 handleDeepLink(url);
                }
-           }
-      });
+             });
 
-      const handleDeepLink = ({ url }) => {
-          console.log('Received deep link outside:', url);
-            // You can route based on the URL
-          if (url.includes('SignupScreen')) {
-              // navigate to a screen
-              console.log('Received deep link inside:', url);
-              navigation.navigate(url)
+             const handleDeepLink = (url) => {
+               console.log('Opened with URL:', url);
+               // Parse and navigate
+               if (url.includes('SignupScreen')) {
+                 navigation.navigate('SignupScreen');
+               }
+             };
+
+             const listener = Linking.addEventListener('url', (event) => {
+               handleDeepLink(event.url);
+             });
+
+             return () => {
+               listener.remove();
+             };
+           }, []);
+    */
+        const onDeepLink = (data: any) => {
+          console.log('Deep Link Data:', data);
+
+          if (data?.data.deep_link_value) {
+            const referralCode = data.data.referral_code || '';
+            const referralUserId = data.data.af_referrer_customer_id || '';
+
+            setReferralCodeOnDeeplink(referralCode);
+            setReferralUserIdOnDeeplink(referralUserId);
+
+            console.log('Navigating with referralCode:', referralCode);
+            console.log('Navigating with referralUserId:', referralUserId);
+
+            navigation.navigate("SignupScreen", {
+              referralCodeOnDeeplink: referralCode,
+              referralUserIdOnDeeplink: referralUserId,
+            });
           }
-      };
-/*
+        };
 
-       useEffect(() => {
-         Linking.getInitialURL().then((url) => {
-           if (url) {
-             handleDeepLink(url);
-           }
-         });
-
-         const handleDeepLink = (url) => {
-           console.log('Opened with URL:', url);
-           // Parse and navigate
-           if (url.includes('SignupScreen')) {
-             navigation.navigate('SignupScreen');
-           }
-         };
-
-         const listener = Linking.addEventListener('url', (event) => {
-           handleDeepLink(event.url);
-         });
-
-         return () => {
-           listener.remove();
-         };
-       }, []);
-*/
-      const onDeepLink = (data: any) => {
-         console.log('Deep Link Data:', data);
-         if (data?.data.deep_link_value) {
-           navigation.navigate(data.data.deep_link_value)
-         }
-      };
-
-      appsFlyer.onDeepLink(onDeepLink);
+          appsFlyer.onDeepLink(onDeepLink);
 
    return (
     <KeyboardAvoidingView
@@ -238,7 +265,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
 
       <TouchableOpacity
         style={tw`mt-6`}
-        onPress={() => navigation.navigate("SignupScreen", { referralCode })}
+        onPress={() => navigation.navigate("SignupScreen")}
       >
         <Text style={tw`text-center text-blue-600 text-base`}>
           Don’t have an account?{' '}
@@ -253,7 +280,21 @@ const SignupScreen: React.FC<{ route: any,  navigation: any }> = ({ route, navig
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const referralCode = route.params?.referralCode || '';
+
+  const referralCodeOnInstall = route.params?.referralCodeOnInstall || '';
+  const referralUserIdOnInstall = route.params?.referralUserIdOnInstall || '';
+
+  const referralCodeOnDeeplink = route.params?.referralCodeOnDeeplink || '';
+  const referralUserIdOnDeeplink = route.params?.referralUserIdOnDeeplink || '';
+
+  const activeReferralCode = referralCodeOnDeeplink || referralCodeOnInstall || '';
+  const activeReferralUserId = referralUserIdOnDeeplink || referralUserIdOnInstall || '';
+
+  console.log("referralCodeOnInstall", referralCodeOnInstall)
+    console.log("referralCodeOnInstall", referralCodeOnInstall)
+
+      console.log("referralCodeOnDeeplink", referralCodeOnDeeplink)
+        console.log("referralUserIdOnDeeplink", referralUserIdOnDeeplink)
 
             const eventName = 'af_signupscreen';
             const eventValues = {
@@ -340,16 +381,24 @@ const SignupScreen: React.FC<{ route: any,  navigation: any }> = ({ route, navig
         />
       </View>
 
-    {referralCode ? (
-      <View style={tw`flex-row items-center mb-3`}>
-        <Text style={tw`text-gray-700`}>
-          Referral Code: <Text style={tw`font-bold text-blue-600`}>{referralCode}</Text>
-        </Text>
-        <TouchableOpacity onPress={handleCopyReferral} style={tw`ml-3`}>
-          <MaterialIcons name="content-copy" size={20} color="#0066CC" />
-        </TouchableOpacity>
-      </View>
-    ) : null}
+        {activeReferralCode ? (
+          <View style={tw`flex-row items-center mb-3`}>
+            <Text style={tw`text-gray-700`}>
+              Referral Code: <Text style={tw`font-bold text-blue-600`}>{activeReferralCode}</Text>
+            </Text>
+            <TouchableOpacity onPress={() => Clipboard.setString(activeReferralCode)} style={tw`ml-3`}>
+              <MaterialIcons name="content-copy" size={20} color="#0066CC" />
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
+        {activeReferralUserId ? (
+          <View style={tw`flex-row items-center mb-3`}>
+            <Text style={tw`text-gray-700`}>
+              Referral User ID: <Text style={tw`font-bold text-blue-600`}>{activeReferralUserId}</Text>
+            </Text>
+          </View>
+        ) : null}
 
       {/* Signup Button */}
       <TouchableOpacity
@@ -424,15 +473,17 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
                     // set the user invite params
                     appsFlyer.generateInviteLink(
                      {
-                       channel: 'AKA Voucher',
-                       campaign: 'AKA_C2',
+                       channel: 'AKA Mobile Application',
+                       campaign: 'AKA_Invite',
                        customerID: identifier,
+                       brandDomain:'uat.akadigital.net',
+                       baseDeepLink: 'aka://banking/SignupScreen',
                        userParams: {
-                         deep_link_value : 'HomeScreen', // deep link param
+                         deep_link_value : 'SignupScreen', // deep link param
                          deep_link_sub1 : '', // deep link param
-                         org_id : 'aka2',
-                         account_id: 'truc2',
-                         brandDomain:'uat.akadigital.net'
+                         org_id : 'AKA',
+                         account_id: 'AKADIGITAL',
+                         referral_code: '123456789'
                        },
                      },
                      (link) => {
