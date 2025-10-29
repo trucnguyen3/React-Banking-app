@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "akastore-project",
+  "private_key_id": "12f96fea3656aa96044ae8655439814ea4766e21",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCoRgRaSIZOLBfP\nZt8aH0r14ItPFZFlndBLK9H35qxatL0Ng38AX0V1bL31dikfPwDsA9tPFDGWX908\nlvGOLKz9cRJt0m+2oy17EGjAvPx6nliPwXFxU05b/NWxMLdvWUYZMZHIoktuFde6\nKS0L8xlVy9f4Gwb76kKHlKpe2WeOu/4fz7lvySvq1gVBv2j+hJM4TOCL/f55TF9/\nY6BGiLviGWJLKClJVumcXJ+jXm1oFMInd3xNdsoyKPB1L4DNIBuGOPyp6Ol5MWGD\nE5z4Aofs8a8EF2jwVgjoQHE9P7Gm1rasj94fWI5DoVk5qShfLMFgVMK0o1nurR7b\n9uKimpJ7AgMBAAECggEAC6JfqFWtrNehQ86N1qgFjkTFTPqlmrF+a8bEAHr7PVWU\nC/b5/8QWhie2Zd4Suh1936jlRQKVP8YxV9WV2OnKLMcLFPsWNznxVI9jYWQPpB4G\nQIDe6jduH6+2SfHKKlGGpl+bf+mHWT1QX4d7nQEPUN5u+Fv3WnvYDWNgI35Y3xuP\n+Jn8tq7SrZKmCb39aDws2t5OnDpOW2oKrZn52n8kunv/Z9Di72s7eGBnx8hNmsap\n+nxzsXK5C0C1BrCPHScb+Uv25QbYewn4QPNj4NpvTUVIWmYcXzBQfv5LVIl80Gej\nogj6QfgBML2/IfREGSFwJkpQ9/PY4+mJ+lGOOfXhaQKBgQDPj6CXIjaG6Y98IlgA\nFWJ9gROdWRSvBiMrduX7Gb/lAwAuun37EPTQAZEqjDurS2hcYSC3SRAvherfQdqO\nAw0UrcXetYRX89+3nNazIOK2DWF+5UvLXRjurwSQvS+Gxwlk35bYNvuTi2Z56QaP\nmoWL/dhX1mgekHkGkYkQy0eL6QKBgQDPizle2XMKwOzW5dTRgNV84yQzE4WzRy7s\nUfnd/Bytr9qK2uBuqq/sG8kpDYbGWEg0GtqWUXMNjXmIsuE2+rmX47l0gmxzDmde\n1l9xcItt9uuTQ2hox7IR/Fw0G30o5Lq4Y/TQ+PMCV6Q4HitwvG5DECSHvfQSmYer\nopUJMGMAwwKBgQCeEA6HiXJkwzCVo8HILoDWeplpVhE+SDo4O09gLXfI+sQE0dhm\nfb8xOEBIWoqGI+LRltXHPkipKB547jl1tDUd7kelFi42nG1d8n4942lComYAsLVL\npRX7jiS35Jpw1Nn+i5bgCN8EuT/MzvxEF7Rjq2g5W/nmbLb9nY73zxYpIQKBgBwa\nM/h95S/tk6Q9lqWPlljEwOARoqb12oqxRu4h9xglmaf3nzAc+Jk14fUnGbq9tXko\nsbRs7vFE2NIDtq8lIABLG4+FIX4q0yBqUp4fqSGIr7lPBVI6yAfbbfi4SChDYG0b\nS8kIDI+iol/e5e7r9Nor02Z1+BiUpWQ+LYQDA0TVAoGBAJ9sOqS0hb3D5I7CMYUO\nOYRu3eTJ7WM3gihGL1oBWT5L0QhYpR2vlCjPKwFk2wc/R5aclN0bfAL1Oy1OEsSv\nxwEf4oIUVgmTEvNr0J3+3+xsHU0ahxi8PXyMZHWszXHECAtyPX+HQ/M6AWvTimoE\nIVJ1WwggJ93jPEOQd51s1TUi\n-----END PRIVATE KEY-----\n",
+  "client_email": "sheet-writter@akastore-project.iam.gserviceaccount.com",
+  "client_id": "108889102263166372412",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sheet-writter%40akastore-project.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

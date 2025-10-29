@@ -17,7 +17,7 @@ import {
   Modal,
   Image,
   Switch,
-  FlatList
+  FlatList,
 } from 'react-native';
 
 import {
@@ -50,6 +50,8 @@ type RootStackParamList = {
   SignupScreen: undefined;
   HomeScreen: undefined
 };
+
+const os = Platform.OS;
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -135,6 +137,39 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
 
        appsFlyer.onInstallConversionData((res) => {
                console.log("onInstallConversionData: ", res)
+
+               if (os === 'ios') {
+                 console.log('Running on iOS');
+                   fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       os: os,
+                       af_method: "onInstallConversionData",
+                       data: res,
+                     }),
+                   })
+                     .then(res => res.text())
+                     .then(console.log)
+                     .catch(console.error);
+               } else if (os === 'android') {
+                 console.log('Running on Android');
+                   fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       os: os,
+                       af_method: "onInstallConversionData",
+                       data: res,
+                     }),
+                   })
+                     .then(res => res.text())
+                     .then(console.log)
+                     .catch(console.error);
+               } else {
+                 console.log('Running on another platform (e.g., web)');
+               }
+
                if (res?.data.deep_link_value) {
                     const referralCode = res.data.referral_code || '';
                     const referralUserId = res.data.af_referrer_customer_id || '';
@@ -195,6 +230,37 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
 */
 
         const onDeepLinkCanceller = appsFlyer.onDeepLink(res => {
+               if (os === 'ios') {
+                 console.log('Running on iOS');
+                   fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       os: os,
+                       af_method: "onDeepLink",
+                       data: res,
+                     }),
+                   })
+                     .then(res => res.text())
+                     .then(console.log)
+                     .catch(console.error);
+               } else if (os === 'android') {
+                 console.log('Running on Android');
+                   fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       os: os,
+                       af_method: "onDeepLink",
+                       data: res,
+                     }),
+                   })
+                     .then(res => res.text())
+                     .then(console.log)
+                     .catch(console.error);
+               } else {
+                 console.log('Running on another platform (e.g., web)');
+               }
           if (res?.deepLinkStatus !== 'NOT_FOUND') {
               const DLValue = res?.data.deep_link_value;
             const mediaSrc = res?.data.media_source;
