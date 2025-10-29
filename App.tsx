@@ -200,6 +200,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                 });
               }
             };
+*/
 
            useEffect(() => {
              Linking.getInitialURL().then((url) => {
@@ -227,7 +228,6 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                listener.remove();
              };
            }, []);
-*/
 
         const onDeepLinkCanceller = appsFlyer.onDeepLink(res => {
                if (os === 'ios') {
