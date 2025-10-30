@@ -84,6 +84,24 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
           (error) => console.error('AppsFlyer error:', error)
         );
 
+              appsFlyer.setOneLinkCustomDomains(["uat.akadigital.net"], (res) => {
+                  console.log(res);
+                    fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       os: os,
+                       af_method: "setOneLinkCustomDomains",
+                       data: res,
+                     }),
+                   })
+                     .then(res => res.text())
+                     .then(console.log)
+                     .catch(console.error);
+              }, (error) => {
+                  console.log(error);
+              });
+
     const handleLogin = async () => {
       if (!identifier || !password) {
         Alert.alert('Error', 'Please enter both email/username and password');
@@ -668,6 +686,18 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
             onPress={() => {
               appsFlyer.setAppInviteOneLinkID('HkUB', (res) => {
                   console.log("setAppInviteOneLinkID: ", res)
+                    fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       os: os,
+                       af_method: "setAppInviteOneLinkID",
+                       data: res,
+                     }),
+                   })
+                     .then(res => res.text())
+                     .then(console.log)
+                     .catch(console.error);
               });
               appsFlyer.generateInviteLink(
                 {
