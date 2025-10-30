@@ -229,45 +229,6 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
               }
             };
 */
-
-           useEffect(() => {
-             Linking.getInitialURL().then((url) => {
-               if (url) {
-                   if (os === 'ios') {
-                     console.log('Running on iOS');
-                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
-                         method: 'POST',
-                         headers: { 'Content-Type': 'application/json' },
-                         body: JSON.stringify({
-                           os: os,
-                           af_method: "getInitialURL",
-                           data: url,
-                         }),
-                       })
-                         .then(res => res.text())
-                         .then(console.log)
-                         .catch(console.error);
-                   } else if (os === 'android') {
-                     console.log('Running on Android');
-                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
-                         method: 'POST',
-                         headers: { 'Content-Type': 'application/json' },
-                         body: JSON.stringify({
-                           os: os,
-                           af_method: "getInitialURL",
-                           data: url,
-                         }),
-                       })
-                         .then(res => res.text())
-                         .then(console.log)
-                         .catch(console.error);
-                   } else {
-                     console.log('Running on another platform (e.g., web)');
-                   }
-                 handleDeepLink(url);
-               }
-             });
-
              const handleDeepLink = (url) => {
                console.log('Opened with URL:', url);
                 try {
@@ -320,6 +281,44 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                     console.error('Invalid deep link URL:', url, error);
                 }
              };
+         
+           useEffect(() => {
+             Linking.getInitialURL().then((url) => {
+               if (url) {
+                   if (os === 'ios') {
+                     console.log('Running on iOS');
+                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({
+                           os: os,
+                           af_method: "getInitialURL",
+                           data: url,
+                         }),
+                       })
+                         .then(res => res.text())
+                         .then(console.log)
+                         .catch(console.error);
+                   } else if (os === 'android') {
+                     console.log('Running on Android');
+                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({
+                           os: os,
+                           af_method: "getInitialURL",
+                           data: url,
+                         }),
+                       })
+                         .then(res => res.text())
+                         .then(console.log)
+                         .catch(console.error);
+                   } else {
+                     console.log('Running on another platform (e.g., web)');
+                   }
+                 handleDeepLink(url);
+               }
+             });
 
              const listener = Linking.addEventListener('url', (event) => {
                if (os === 'ios') {
