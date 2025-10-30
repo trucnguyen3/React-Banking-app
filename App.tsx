@@ -79,6 +79,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
     const [referralCodeOnDeeplink, setReferralCodeOnDeeplink] = useState('');
     const [referralUserIdOnDeeplink, setReferralUserIdOnDeeplink] = useState('');
 
+    //Update Node version if iOS app got Zero code
        appsFlyer.initSdk(
           {
             devKey: 'cYmtVpJCBSET23rRv4GWXa',
@@ -265,20 +266,24 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                    }
                     try {
                       console.log('URL:', url);
-
-                      // Extract screen name manually
+                      // ✅ Split the URL path safely
                       const parts = url.split('/');
-                      const screenName = parts[3] || null;
+                      // parts example: ["aka:", "", "banking", "SignupScreen?af_android_url=..."]
 
-                      // Optional: extract query params manually
+                      // ✅ Extract the 4th segment and remove any query string
+                      const rawScreen = parts[3] || '';
+                      const screenName = rawScreen.split('?')[0] || null;
+
+                      // ✅ Extract query params (after '?')
                       const query = url.split('?')[1];
                       const params = new URLSearchParams(query || '');
+
                       const referralCodeOnDeeplink = params.get('referral_code') || null;
                       const referralUserIdOnDeeplink = params.get('af_referrer_customer_id') || null;
 
-                      console.log('screenName:', screenName);
-                      console.log('referralCode:', referralCodeOnDeeplink);
-                      console.log('referralUserId:', referralUserIdOnDeeplink);
+                      console.log('Screen Name:', screenName);
+                      console.log('Referral Code:', referralCodeOnDeeplink);
+                      console.log('Referral User ID:', referralUserIdOnDeeplink);
 
                         if (screenName) {
                           console.log('Navigating to:', screenName);
@@ -331,19 +336,24 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                      console.log('Running on another platform (e.g., web)');
                    }
                    try {
-                      // Extract screen name manually
+                      // ✅ Split the URL path safely
                       const parts = event.url.split('/');
-                      const screenName = parts[3] || null;
+                      // parts example: ["aka:", "", "banking", "SignupScreen?af_android_url=..."]
 
-                      // Optional: extract query params manually
+                      // ✅ Extract the 4th segment and remove any query string
+                      const rawScreen = parts[3] || '';
+                      const screenName = rawScreen.split('?')[0] || null;
+
+                      // ✅ Extract query params (after '?')
                       const query = event.url.split('?')[1];
                       const params = new URLSearchParams(query || '');
+
                       const referralCodeOnDeeplink = params.get('referral_code') || null;
                       const referralUserIdOnDeeplink = params.get('af_referrer_customer_id') || null;
 
-                      console.log('screenName:', screenName);
-                      console.log('referralCode:', referralCodeOnDeeplink);
-                      console.log('referralUserId:', referralUserIdOnDeeplink);
+                      console.log('Screen Name:', screenName);
+                      console.log('Referral Code:', referralCodeOnDeeplink);
+                      console.log('Referral User ID:', referralUserIdOnDeeplink);
 
                         if (screenName) {
                           console.log('Navigating to:', screenName);
