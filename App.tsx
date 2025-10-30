@@ -297,6 +297,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
 
             // ✅ Handle when app is already open
             const subscription = Linking.addEventListener('url', (event) => {
+               console.log('URL:', event.url);
                if (event.url) {
                    if (os === 'ios') {
                      console.log('Running on iOS');
@@ -330,8 +331,6 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                      console.log('Running on another platform (e.g., web)');
                    }
                    try {
-                      console.log('URL:', event.url);
-
                       // Extract screen name manually
                       const parts = event.url.split('/');
                       const screenName = parts[3] || null;
