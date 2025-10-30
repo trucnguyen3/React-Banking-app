@@ -280,34 +280,35 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
 
                     if (screenName) {
                       console.log('Navigating to:', screenName);
-                   if (os === 'ios') {
-                     console.log('Running on iOS');
-                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
-                         method: 'POST',
-                         headers: { 'Content-Type': 'application/json' },
-                         body: JSON.stringify({
-                           os: os,
-                           af_method: "parsed.pathname.replace",
-                           data: screenName,
-                         }),
-                       })
-                         .then(res => res.text())
-                         .then(console.log)
-                         .catch(console.error);
-                   } else if (os === 'android') {
-                     console.log('Running on Android');
-                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
-                         method: 'POST',
-                         headers: { 'Content-Type': 'application/json' },
-                         body: JSON.stringify({
-                           os: os,
-                           af_method: "parsed.pathname.replace",
-                           data: screenName,
-                         }),
-                       })
-                         .then(res => res.text())
-                         .then(console.log)
-                         .catch(console.error);
+                      if (os === 'ios') {
+                          console.log('Running on iOS');
+                            fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    os: os,
+                                    af_method: "parsed.pathname.replace",
+                                    data: screenName,
+                                }),
+                            })
+                            .then(res => res.text())
+                            .then(console.log)
+                            .catch(console.error);
+                      } else if (os === 'android') {
+                        console.log('Running on Android');
+                        fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                os: os,
+                                af_method: "parsed.pathname.replace",
+                                data: screenName,
+                            }),
+                        })
+                        .then(res => res.text())
+                        .then(console.log)
+                        .catch(console.error);
+                      }
                       navigation.navigate(screenName, {
                         referralCodeOnDeeplink,
                         referralUserIdOnDeeplink,
