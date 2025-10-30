@@ -273,7 +273,10 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                 try {
                     const parsed = new URL(url);
                     const path = parsed.pathname.replace('/', '');
-                    const screenName = path ? `${path}Screen` : null;
+                    const screenName = path ? `${path}` : null;
+
+                    const referralCodeOnDeeplink = parsed.searchParams.get('referral_code') || null;
+                    const referralUserIdOnDeeplink = parsed.searchParams.get('af_referrer_customer_id') || null;
 
                     if (screenName) {
                       console.log('Navigating to:', screenName);
