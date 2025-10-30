@@ -229,6 +229,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
               }
             };
 */
+           useEffect(() => {
              const handleDeepLink = (url) => {
                console.log('Opened with URL:', url);
                 try {
@@ -281,8 +282,8 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                     console.error('Invalid deep link URL:', url, error);
                 }
              };
-         
-           useEffect(() => {
+
+
              Linking.getInitialURL().then((url) => {
                if (url) {
                    if (os === 'ios') {
