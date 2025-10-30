@@ -45,10 +45,20 @@ type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
+type MainTabsParamList = {
+  Home: undefined;
+  Payments: undefined;
+  Insights: undefined;
+  Profile: undefined;
+};
+
 type RootStackParamList = {
   LoginScreen: undefined;
   SignupScreen: undefined;
-  HomeScreen: undefined
+  BillPaymentsScreen: undefined;
+  HistoriesScreen: undefined;
+  DepositScreen: undefined;
+  MainTabs: NavigatorScreenParams<MainTabsParamList> | undefined;
 };
 
 const os = Platform.OS;
@@ -195,7 +205,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                     setReferralCodeOnInstall(referralCode);
                     setReferralUserIdOnInstall(referralUserId);
 
-                    navigation.navigate("SignupScreen", {
+                    navigation.navigate(res.data.deep_link_value, {
                       referralCodeOnInstall: referralCode,
                       referralUserIdOnInstall: referralUserId,
                     });
@@ -223,22 +233,95 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
            useEffect(() => {
              Linking.getInitialURL().then((url) => {
                if (url) {
+                   if (os === 'ios') {
+                     console.log('Running on iOS');
+                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({
+                           os: os,
+                           af_method: "getInitialURL",
+                           data: url,
+                         }),
+                       })
+                         .then(res => res.text())
+                         .then(console.log)
+                         .catch(console.error);
+                   } else if (os === 'android') {
+                     console.log('Running on Android');
+                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({
+                           os: os,
+                           af_method: "getInitialURL",
+                           data: url,
+                         }),
+                       })
+                         .then(res => res.text())
+                         .then(console.log)
+                         .catch(console.error);
+                   } else {
+                     console.log('Running on another platform (e.g., web)');
+                   }
                  handleDeepLink(url);
                }
              });
 
              const handleDeepLink = (url) => {
                console.log('Opened with URL:', url);
-               // Parse and navigate
-               if (url.includes('SignupScreen')) {
-                navigation.navigate('SignupScreen', {
-                  referralCodeOnDeeplink,
-                  referralUserIdOnDeeplink,
-                });
-               }
+                try {
+                    const parsed = new URL(url);
+                    const path = parsed.pathname.replace('/', '');
+                    const screenName = path ? `${path}Screen` : null;
+
+                    if (screenName) {
+                      console.log('Navigating to:', screenName);
+
+                      navigation.navigate(screenName, {
+                        referralCodeOnDeeplink,
+                        referralUserIdOnDeeplink,
+                      });
+                    } else {
+                      console.warn('No screen name found in URL:', url);
+                    }
+                } catch (error) {
+                    console.error('Invalid deep link URL:', url, error);
+                }
              };
 
              const listener = Linking.addEventListener('url', (event) => {
+               if (os === 'ios') {
+                 console.log('Running on iOS');
+                   fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       os: os,
+                       af_method: "Linking.addEventListener",
+                       data: event,
+                     }),
+                   })
+                     .then(res => res.text())
+                     .then(console.log)
+                     .catch(console.error);
+               } else if (os === 'android') {
+                 console.log('Running on Android');
+                   fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       os: os,
+                       af_method: "Linking.addEventListener",
+                       data: event,
+                     }),
+                   })
+                     .then(res => res.text())
+                     .then(console.log)
+                     .catch(console.error);
+               } else {
+                 console.log('Running on another platform (e.g., web)');
+               }
                handleDeepLink(event.url);
              });
 
@@ -280,9 +363,6 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                  console.log('Running on another platform (e.g., web)');
                }
           if (res?.deepLinkStatus !== 'NOT_FOUND') {
-              const DLValue = res?.data.deep_link_value;
-            const mediaSrc = res?.data.media_source;
-            const param1 = res?.data.af_sub1;
             console.log("onDeepLink: ", JSON.stringify(res?.data, null, 2));
 
             if (res?.data.deep_link_value) {
@@ -295,7 +375,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                 console.log('Navigating with referralCode:', referralCode);
                 console.log('Navigating with referralUserId:', referralUserId);
 
-                navigation.navigate("SignupScreen", {
+                navigation.navigate(res.data.deep_link_value, {
                   referralCodeOnDeeplink: referralCode,
                   referralUserIdOnDeeplink: referralUserId,
                 });
@@ -711,6 +791,7 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
                     org_id: 'AKA',
                     account_id: 'AKADIGITAL',
                     referral_code: '123456789',
+                    af_force_deeplink: true
                   },
                 },
                 (link) => setInviteLink(link),
