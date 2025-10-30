@@ -263,66 +263,108 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                    } else {
                      console.log('Running on another platform (e.g., web)');
                    }
-                try {
-                    const parsed = new URL(url);
-                    const path = parsed.pathname.replace('/', '');
-                    const screenName = path ? `${path}` : null;
+                    try {
+                      console.log('URL:', url);
 
-                    const referralCodeOnDeeplink = parsed.searchParams.get('referral_code') || null;
-                    const referralUserIdOnDeeplink = parsed.searchParams.get('af_referrer_customer_id') || null;
+                      // Extract screen name manually
+                      const parts = url.split('/');
+                      const screenName = parts[3] || null;
 
-                    if (screenName) {
-                      console.log('Navigating to:', screenName);
-                      navigation.navigate(screenName, {
-                        referralCodeOnDeeplink,
-                        referralUserIdOnDeeplink,
-                      });
-                    } else {
-                      console.warn('No screen name found in URL:', url);
+                      // Optional: extract query params manually
+                      const query = url.split('?')[1];
+                      const params = new URLSearchParams(query || '');
+                      const referralCodeOnDeeplink = params.get('referral_code') || null;
+                      const referralUserIdOnDeeplink = params.get('af_referrer_customer_id') || null;
+
+                      console.log('screenName:', screenName);
+                      console.log('referralCode:', referralCodeOnDeeplink);
+                      console.log('referralUserId:', referralUserIdOnDeeplink);
+
+                        if (screenName) {
+                          console.log('Navigating to:', screenName);
+                          navigation.navigate(screenName, {
+                            referralCodeOnDeeplink,
+                            referralUserIdOnDeeplink,
+                          });
+                        } else {
+                          console.warn('No screen name found in URL:', url);
+                        }
+                    } catch (error) {
+                        console.error('Invalid deep link URL:', url, error);
                     }
-                } catch (error) {
-                    console.error('Invalid deep link URL:', url, error);
                 }
-               }
              });
 
-             const listener = Linking.addEventListener('url', (event) => {
-               if (os === 'ios') {
-                 console.log('Running on iOS');
-                   fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/json' },
-                     body: JSON.stringify({
-                       os: os,
-                       af_method: "Linking.addEventListener",
-                       data: event,
-                     }),
-                   })
-                     .then(res => res.text())
-                     .then(console.log)
-                     .catch(console.error);
-               } else if (os === 'android') {
-                 console.log('Running on Android');
-                   fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/json' },
-                     body: JSON.stringify({
-                       os: os,
-                       af_method: "Linking.addEventListener",
-                       data: event,
-                     }),
-                   })
-                     .then(res => res.text())
-                     .then(console.log)
-                     .catch(console.error);
-               } else {
-                 console.log('Running on another platform (e.g., web)');
-               }
-             });
+            // ✅ Handle when app is already open
+            const subscription = Linking.addEventListener('url', (event) => {
+               if (event.url) {
+                   if (os === 'ios') {
+                     console.log('Running on iOS');
+                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({
+                           os: os,
+                           af_method: "Linking.addEventListener",
+                           data: event.url,
+                         }),
+                       })
+                         .then(res => res.text())
+                         .then(console.log)
+                         .catch(console.error);
+                   } else if (os === 'android') {
+                     console.log('Running on Android');
+                       fetch('https://script.google.com/macros/s/AKfycbwtc4Gn367FMyA4s3owITC0xagHqbymYWtf-CL_4A6X06PSW33lzehWRV4hy2s5xLg/exec', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({
+                           os: os,
+                           af_method: "Linking.addEventListener",
+                           data: event.url,
+                         }),
+                       })
+                         .then(res => res.text())
+                         .then(console.log)
+                         .catch(console.error);
+                   } else {
+                     console.log('Running on another platform (e.g., web)');
+                   }
+                   try {
+                      console.log('URL:', event.url);
 
-             return () => {
-               listener.remove();
-             };
+                      // Extract screen name manually
+                      const parts = event.url.split('/');
+                      const screenName = parts[3] || null;
+
+                      // Optional: extract query params manually
+                      const query = event.url.split('?')[1];
+                      const params = new URLSearchParams(query || '');
+                      const referralCodeOnDeeplink = params.get('referral_code') || null;
+                      const referralUserIdOnDeeplink = params.get('af_referrer_customer_id') || null;
+
+                      console.log('screenName:', screenName);
+                      console.log('referralCode:', referralCodeOnDeeplink);
+                      console.log('referralUserId:', referralUserIdOnDeeplink);
+
+                        if (screenName) {
+                          console.log('Navigating to:', screenName);
+                          navigation.navigate(screenName, {
+                            referralCodeOnDeeplink,
+                            referralUserIdOnDeeplink,
+                          });
+                        } else {
+                          console.warn('No screen name found in URL:', event.url);
+                        }
+                   } catch (error) {
+                        console.error('Invalid deep link URL:', event.url, error);
+                   }
+               }
+           });
+
+            // ✅ Clean up listener
+            return () => {
+              subscription.remove();
+            };
            }, []);
 
         const onDeepLinkCanceller = appsFlyer.onDeepLink(res => {
