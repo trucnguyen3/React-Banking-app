@@ -200,8 +200,8 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                }
 
                if (res?.data.deep_link_value) {
-                    const referralCode = res.data.af_sub1 || '';
-                    const referralUserId = res.data.af_sub2 || '';
+                    const referralCode = res.data.deep_link_sub2 || '';
+                    const referralUserId = res.data.deep_link_sub3 || '';
 
                     setReferralCodeOnInstall(referralCode);
                     setReferralUserIdOnInstall(referralUserId);
@@ -278,8 +278,8 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                       const query = url.split('?')[1];
                       const params = new URLSearchParams(query || '');
 
-                      const referralCodeOnDeeplink = params.get('af_sub1') || null;
-                      const referralUserIdOnDeeplink = params.get('af_sub2') || null;
+                      const referralCodeOnDeeplink = params.get('deep_link_sub2') || null;
+                      const referralUserIdOnDeeplink = params.get('deep_link_sub3') || null;
 
                       console.log('Screen Name:', screenName);
                       console.log('Referral Code:', referralCodeOnDeeplink);
@@ -348,8 +348,8 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                       const query = event.url.split('?')[1];
                       const params = new URLSearchParams(query || '');
 
-                      const referralCodeOnDeeplink = params.get('af_sub1') || null;
-                      const referralUserIdOnDeeplink = params.get('af_sub2') || null;
+                      const referralCodeOnDeeplink = params.get('deep_link_sub2') || null;
+                      const referralUserIdOnDeeplink = params.get('deep_link_sub3') || null;
 
                       console.log('Screen Name:', screenName);
                       console.log('Referral Code:', referralCodeOnDeeplink);
@@ -412,8 +412,8 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
             console.log("onDeepLink: ", JSON.stringify(res?.data, null, 2));
 
             if (res?.data.deep_link_value) {
-                const referralCode = res.data.af_sub1 || '';
-                const referralUserId = res.data.af_sub2 || '';
+                const referralCode = res.data.deep_link_sub2 || '';
+                const referralUserId = res.data.deep_link_sub3 || '';
 
                 setReferralCodeOnDeeplink(referralCode);
                 setReferralUserIdOnDeeplink(referralUserId);
@@ -836,9 +836,11 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
                     deep_link_value: 'SignupScreen',
                     org_id: 'AKA',
                     account_id: 'AKADIGITAL',
-                    referral_code: '123456789',
-                    af_sub1: '123456789',
+                    referral_code: 'F59E0B',
+                    af_sub1: 'C00134',
                     af_sub2: identifier,
+                    deep_link_sub2: '0066CC',
+                    deep_link_sub3: identifier,
                     af_force_deeplink: true,
                     af_dp: 'aka://banking/SignupScreen'
                   },
