@@ -829,7 +829,7 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
                 {
                   channel: 'AKA Banking Application',
                   campaign: 'AKA_Invite_App',
-                  customerID: identifier,
+                  customerID: displayUser,
                   brandDomain: 'uat.akadigital.net',
                   baseDeepLink: 'aka://banking/SignupScreen',
                   userParams: {
@@ -838,9 +838,9 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
                     account_id: 'AKADIGITAL',
                     referral_code: 'F59E0B',
                     af_sub1: 'C00134',
-                    af_sub2: identifier,
+                    af_sub2: displayUser,
                     deep_link_sub2: '0066CC',
-                    deep_link_sub3: identifier,
+                    deep_link_sub3: displayUser,
                     af_force_deeplink: true,
                     af_dp: 'aka://banking/SignupScreen'
                   },
