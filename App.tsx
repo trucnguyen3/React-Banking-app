@@ -842,7 +842,8 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
                     deep_link_sub2: '0066CC',
                     deep_link_sub3: displayUser,
                     af_force_deeplink: true,
-                    af_dp: 'aka://banking/SignupScreen'
+                    af_dp: 'aka://banking/SignupScreen',
+                    is_retargeting: true
                   },
                 },
                 (link) => setInviteLink(link),
