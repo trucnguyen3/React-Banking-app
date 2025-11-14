@@ -799,6 +799,15 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
               <FontAwesome name="history" size={26} color="#0066CC" />
               <Text style={tw`ml-3 text-gray-800 font-medium`}>History</Text>
             </TouchableOpacity>
+
+            {/* Apply Card */}
+            <TouchableOpacity
+              style={tw`w-[48%] bg-white p-4 mb-3 rounded-xl shadow-sm flex-row items-center`}
+              onPress={() => navigation.navigate('CardApplyScreen', { identifier, name })}
+            >
+              <FontAwesome name="credit-card" size={26} color="#0066CC" />
+              <Text style={tw`ml-3 text-gray-800 font-medium`}>Apply Card</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -1433,7 +1442,7 @@ const BillPaymentsScreen: React.FC<{ navigation: any; route: any }> = ({ navigat
       <TouchableOpacity
         onPress={handlePayAll}
         style={{
-          backgroundColor: selected.length > 0 ? '#2563EB' : '#9CA3AF',
+          backgroundColor: '#0066CC',
           paddingVertical: 14,
           borderRadius: 12,
           marginTop: 12,
@@ -1449,7 +1458,7 @@ const BillPaymentsScreen: React.FC<{ navigation: any; route: any }> = ({ navigat
       <TouchableOpacity
         onPress={() => navigation.navigate("MainTabs", { screen: 'Home', params: { identifier, name }})}
         style={{
-          backgroundColor: '#0066CC',
+          backgroundColor: selected.length > 0 ? '#2563EB' : '#9CA3AF',
           paddingVertical: 14,
           borderRadius: 12,
           marginTop: 12,
@@ -1606,6 +1615,121 @@ const DepositScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
   );
 };
 
+const cardTypes = [
+  {
+    id: "debit",
+    name: "Debit Card",
+    desc: "Spend with the current balance in the account.",
+    image: require('./AppImages/debit_card.png')
+  },
+  {
+    id: "credit",
+    name: "Credit Card",
+    desc: "Buy now – pay later with credit limit.",
+    image: require('./AppImages/credit_card.png')
+  },
+  {
+    id: "virtual",
+    name: "Virtual Card",
+    desc: "Safe and fast online payment.",
+    image: require('./AppImages/virtual_card.png')
+  },
+  {
+    id: "prepaid",
+    name: "Prepaid Card",
+    desc: "Top up before use, no account required.",
+    image: require('./AppImages/prepaid_card.png')
+  }
+];
+
+const CardApplyScreen = ({ navigation, route }) => {
+  const { identifier, name } = route?.params || {};
+  const [selected, setSelected] = useState<string | null>(null);
+
+  return (
+    <View style={tw`flex-1 bg-gray-100 p-5`}>
+      <Text style={tw`text-2xl font-bold text-gray-900 mb-4`}>
+        Select Card
+      </Text>
+
+      <FlatList
+        data={cardTypes}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => setSelected(item.id)}
+            style={[
+              tw`rounded-2xl mb-5 overflow-hidden`,
+              {
+                backgroundColor: "#fff",
+                borderWidth: selected === item.id ? 2 : 0,
+                borderColor: selected === item.id ? "#3B82F6" : "transparent",
+                shadowColor: "#000",
+                shadowOpacity: 0.15,
+                shadowRadius: 6,
+                shadowOffset: { width: 0, height: 4 },
+                elevation: 5,
+              }
+            ]}
+          >
+            {/* Card Image */}
+            <Image
+              source={item.image}
+              style={{ width: 380, height: 200, borderRadius: 16, marginLeft: -15 }}
+            />
+
+            {/* Card Text */}
+            <View style={tw`p-4`}>
+              <Text style={tw`text-xl font-bold text-gray-900`}>{item.name}</Text>
+              <Text style={tw`text-gray-600 mt-1`}>{item.desc}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+
+      {/* Register Button */}
+      <TouchableOpacity
+        onPress={() => {
+          if (!selected) return alert("Select one card.");
+          alert(`Apply ${selected.toUpperCase()} successfully!`);
+        }}
+        style={{
+          backgroundColor: '#0066CC',
+          paddingVertical: 14,
+          borderRadius: 12,
+          marginTop: 12,
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
+          Apply Card
+        </Text>
+      </TouchableOpacity>
+
+      {/* Back to Home */}
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("MainTabs", {
+            screen: "Home",
+            params: { identifier, name }
+          })
+        }
+        style={{
+          backgroundColor: '#9CA3AF',
+          paddingVertical: 14,
+          borderRadius: 12,
+          marginTop: 12,
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
+          Home
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 const TabNavigator = ({ route }: any) => {
     const { identifier, name } = route.params || {};
     return (
@@ -1649,6 +1773,7 @@ const App: React.FC = () => {
         <Stack.Screen name="BillPaymentsScreen" component={BillPaymentsScreen} />
         <Stack.Screen name="HistoriesScreen" component={HistoriesScreen} />
         <Stack.Screen name="DepositScreen" component={DepositScreen} />
+        <Stack.Screen name="CardApplyScreen" component={CardApplyScreen} />
 
         {/* Main app with bottom tabs */}
         <Stack.Screen name="MainTabs" component={TabNavigator} />
