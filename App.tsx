@@ -33,6 +33,7 @@ import tw from 'twrnc';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { FontAwesome } from "@react-native-vector-icons/fontawesome";
 import appsFlyer from 'react-native-appsflyer';
+const CleverTap = require('clevertap-react-native');
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -89,6 +90,9 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
         // 2) Then request permission automatically
         const newStatus = await requestTrackingPermission();
         setTrackingStatus(newStatus);
+
+        CleverTap.registerForPush();
+        CleverTap.addListener(CleverTap.CleverTapPushNotificationClicked, (e)=>{/*consume the event*/})
       } catch (e) {
         Alert.alert('Error', e?.toString?.() ?? e);
       }
@@ -175,6 +179,14 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
         appsFlyer.setCustomerUserId(identifier, (res) => {
           console.log('AppsFlyer ' + identifier + ' set:', res);
         });
+
+        CleverTap.onUserLogin({'Name': 'Truc Test', 'Identity': identifier, 'Email': ''});
+
+        CleverTap.recordEvent(
+          'login_success', {
+              'screen_id': 0,
+              'screen_name': 'login'
+          });
 
         navigation.reset({
           index: 0,
@@ -577,6 +589,14 @@ const SignupScreen: React.FC<{ route: any,  navigation: any }> = ({ route, navig
       appsFlyer.setCustomerUserId(name, (res) => {
         console.log('AppsFlyer ' + name + ' set:', res);
       });
+
+      CleverTap.onUserLogin({'Name': 'Truc Test', 'Identity': name, 'Email': email});
+
+      CleverTap.recordEvent(
+        'signup_success', {
+            'screen_id': 1,
+            'screen_name': 'signup'
+        });
 
       navigation.reset({
         index: 0,
