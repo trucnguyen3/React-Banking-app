@@ -1,0 +1,2 @@
+Device ID	Device Name	Device Platform
+00008030-000835143c8a802e	xuantrucx123@gmail.com - iPhone 11 Pro Max	ios
