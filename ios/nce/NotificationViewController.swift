@@ -5,6 +5,11 @@ class NotificationViewController: CTNotificationViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+      
+      let action1 = UNNotificationAction(identifier: "action_1", title: "Back", options: [])
+      let action2 = UNNotificationAction(identifier: "action_2", title: "Next", options: [])
+      let action3 = UNNotificationAction(identifier: "action_3", title: "View In App", options: [])
+      
     }
     
     // optional: implement to get user event data
