@@ -34,6 +34,7 @@ local.properties
 *.keystore
 !debug.keystore
 .kotlin/
+android/app/akastore-project-firebase-adminsdk-fbsvc-a9ebcffe3e.json
 
 # node.js
 #
