@@ -58,11 +58,11 @@
           </intent-filter>
       </activity>
 
-        <service
-            android:exported="true"
-            android:name="com.appsflyer.FirebaseMessagingServiceListener">
+
+
+        <service android:name="com.clevertap.android.sdk.pushnotification.fcm.FcmMessageListenerService"  android:exported="true">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 

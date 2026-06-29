@@ -33,6 +33,7 @@ import tw from 'twrnc';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { FontAwesome } from "@react-native-vector-icons/fontawesome";
 import appsFlyer from 'react-native-appsflyer';
+const CleverTap = require('clevertap-react-native');
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -52,8 +53,6 @@ import { Mixpanel } from 'mixpanel-react-native';
 import DeviceInfo from 'react-native-device-info';
 
 import ReactNativeIdfaAaid, { AdvertisingInfoResponse } from '@sparkfabrik/react-native-idfa-aaid';
-
-const CleverTap = require('clevertap-react-native');
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -126,6 +125,8 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
 
   const [userId, setUserId] = useState<string | null>(null);
 
+  CleverTap.createNotificationChannel("akareact1", "Clever Tap React Native Testing", "CT React Native Testing", 5, true) // The notification channel importance can have any value from 1 to 5. A higher value means a more interruptive notification.
+
     useEffect(() => {
       ReactNativeIdfaAaid.getAdvertisingInfo()
         .then((res) => {
@@ -151,6 +152,9 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
         // 2) Then request permission automatically
         const newStatus = await requestTrackingPermission();
         setTrackingStatus(newStatus);
+
+        CleverTap.registerForPush();
+        CleverTap.addListener(CleverTap.CleverTapPushNotificationClicked, (e)=>{/*consume the event*/})
       } catch (e) {
         Alert.alert('Error', e?.toString?.() ?? e);
       }
@@ -320,6 +324,12 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
         });
 
         CleverTap.onUserLogin({'Identity': identifier});
+
+                CleverTap.recordEvent(
+                  'login_success', {
+                      'screen_id': 0,
+                      'screen_name': 'login'
+                  });
 
         CleverTap.profileSet({'distinctID': identifier})
 
@@ -747,6 +757,12 @@ const SignupScreen: React.FC<{ route: any,  navigation: any }> = ({ route, navig
       CleverTap.onUserLogin({'Name': name, 'Identity': name, 'Email': email, 'Phone': generateVietnamMobileNumber()});
 
       CleverTap.profileSet({'distinctID': name})
+
+      CleverTap.recordEvent(
+        'signup_success', {
+            'screen_id': 1,
+            'screen_name': 'signup'
+        });
 
       navigation.reset({
         index: 0,

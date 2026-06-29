@@ -114,10 +114,12 @@ dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:34.6.0')
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-messaging:23.0.3'
+    implementation 'com.google.firebase:firebase-messaging:24.0.0'
     implementation 'com.google.firebase:firebase-core:20.1.2'
 
-    implementation 'com.clevertap.android:clevertap-android-sdk:7.0.2'
+    implementation 'com.clevertap.android:clevertap-android-sdk:8.1.0'
+    implementation "com.clevertap.android:push-templates:2.2.0" // 2.1.0 and above
+    implementation "com.clevertap.android:clevertap-android-sdk:7.8.0" // 7.4.1 and above
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
