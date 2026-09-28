@@ -48,6 +48,12 @@ import {
   TrackingStatus,
 } from 'react-native-tracking-transparency';
 
+import { Mixpanel } from 'mixpanel-react-native';
+
+import DeviceInfo from 'react-native-device-info';
+
+import ReactNativeIdfaAaid, { AdvertisingInfoResponse } from '@sparkfabrik/react-native-idfa-aaid';
+
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
@@ -73,11 +79,67 @@ const os = Platform.OS;
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
 
+    const trackAutomaticEvents = false;
+    const useNative = true;
+    const serverURL = 'https://api.mixpanel.com';
+    const optOutTrackingDefault = false;
+    const superProperties = {
+      'data_source':'MP-React'
+      }
+
+    const mixpanel = new Mixpanel(
+      'd5c71d31bc37758fc8d70beecbed2365',
+      trackAutomaticEvents,
+      useNative,
+      serverURL,
+      optOutTrackingDefault,
+      superProperties
+    );
+
+    //initialize Mixpanel
+    mixpanel.init();
+
+    //Update Node version if iOS app got Zero code
+       appsFlyer.initSdk(
+          {
+            devKey: 'cYmtVpJCBSET23rRv4GWXa',
+            isDebug: true,
+            appId: '6754323492',
+            onInstallConversionDataListener: true,
+            onDeepLinkListener: true,
+            //timeToWaitForATTUserAuthorization: 10,
+          },
+          (result) => {
+              console.log('AppsFlyer SDK initialized:', result)
+          },
+          (error) => console.error('AppsFlyer error:', error)
+        );
+
 const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => {
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = { backgroundColor: isDarkMode ? '#222' : '#fff' };
 
   const [trackingStatus, setTrackingStatus] = useState<TrackingStatus | '(loading)'>('(loading)');
+
+  const [deviceID, setIdfa] = useState<string | null>();
+
+  const [userId, setUserId] = useState<string | null>(null);
+
+  CleverTap.createNotificationChannel("akareact1", "Clever Tap React Native Testing", "CT React Native Testing", 5, true) // The notification channel importance can have any value from 1 to 5. A higher value means a more interruptive notification.
+
+    useEffect(() => {
+      ReactNativeIdfaAaid.getAdvertisingInfo()
+        .then((res) => {
+          if (res.isAdTrackingLimited) {
+            setIdfa(null);
+          } else {
+            setIdfa(res.id);
+          }
+        })
+        .catch((err) => {
+          setIdfa(null);
+        });
+    }, []);
 
   // Auto run when screen opens
   useEffect(() => {
@@ -99,6 +161,39 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
     };
 
     init();
+
+    async function setupMixpanel() {
+          try {
+            const anonymousId = await mixpanel.getDistinctId();
+            console.log("Anonymous ID:", anonymousId);
+
+            setUserId(anonymousId); // Set the anonymous ID initially
+
+            appsFlyer.setCustomerUserId(anonymousId, (res) => {
+                console.log("APPSFLYER", res)
+            });
+            mixpanel.track('mapping_appsflyer_success', { deeplink: 'aka://demo/home' });
+
+            CleverTap.profileSet({'distinctID': anonymousId})
+            mixpanel.track('mapping_clevertap_success', { deeplink: 'aka://demo/home' });
+
+            CleverTap.recordEvent(
+               'Load Profile Successful ', {
+                   "distinctID": anonymousId,
+                   "Source": "AKA DEV",
+                   "Date": new Date()
+               }
+            );
+
+            CleverTap.getCleverTapID((id) => {
+                console.log('New CleverTap ID:', id);
+            });
+          } catch (error) {
+            console.error("Mixpanel setup error:", error);
+          }
+        }
+
+        setupMixpanel();
   }, []);
 
 
@@ -111,6 +206,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
     const [referralCodeOnDeeplink, setReferralCodeOnDeeplink] = useState('');
     const [referralUserIdOnDeeplink, setReferralUserIdOnDeeplink] = useState('');
 
+<<<<<<< HEAD
     //Update Node version if iOS app got Zero code
        appsFlyer.initSdk(
           {
@@ -126,6 +222,9 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
           },
           (error) => console.error('AppsFlyer error:', error)
         );
+=======
+    const [isFirstLaunch, setFirstLaunch] = useState('');
+>>>>>>> 77c933a3582d57d6791414e0c433f3cdc6d10755
 
               appsFlyer.setOneLinkCustomDomains(["uat.akadigital.net"], (res) => {
                   console.log(res);
@@ -145,67 +244,16 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                   console.log(error);
               });
 
-    const handleLogin = async () => {
-      if (!identifier || !password) {
-        Alert.alert('Error', 'Please enter both email/username and password');
-        return;
-      }
-
-      try {
-        if (onLogin) {
-          await onLogin({ identifier, password });
-        } else {
-          Alert.alert('Login', 'Pretend login successful (pass a real onLogin prop).');
-        }
-
-          const eventName = 'af_loginscreen';
-          const eventValues = {
-            af_screenid: '1',
-            af_screenname: 'Login Screen',
-            af_deeplink: 'LoginScreen',
-          };
-
-          appsFlyer.logEvent(
-            eventName,
-            eventValues,
-            (res) => {
-              console.log(eventName + ' triggered ' + res);
-            },
-            (err) => {
-              console.error(err);
-            }
-          );
-
-        appsFlyer.setCustomerUserId(identifier, (res) => {
-          console.log('AppsFlyer ' + identifier + ' set:', res);
-        });
-
-        CleverTap.onUserLogin({'Name': 'Truc Test', 'Identity': identifier, 'Email': ''});
-
-        CleverTap.recordEvent(
-          'login_success', {
-              'screen_id': 0,
-              'screen_name': 'login'
-          });
-
-        navigation.reset({
-          index: 0,
-          routes: [{
-              name: 'MainTabs' ,
-              params: { identifier }
-          }],
-        });
-      } catch (e) {
-        Alert.alert('Login failed', e?.message || 'Unknown error');
-      }
-    };
-
     appsFlyer.onAppOpenAttribution((res) => {
       console.log("onAppOpenAttribution: ", res);
     });
 
        appsFlyer.onInstallConversionData((res) => {
                console.log("onInstallConversionData: ", res)
+
+                const firstLaunch = res?.data?.is_first_launch;
+                setFirstLaunch(firstLaunch);
+                console.log("AppsFlyer isFirstLaunch =", firstLaunch);
 
                if (os === 'ios') {
                  console.log('Running on iOS');
@@ -257,6 +305,102 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
                    };
                }
           });
+
+    const handleLogin = async () => {
+      if (!identifier || !password) {
+        Alert.alert('Error', 'Please enter both email/username and password');
+        return;
+      }
+
+      try {
+        if (onLogin) {
+          await onLogin({ identifier, password });
+        } else {
+          Alert.alert('Login', 'Pretend login successful (pass a real onLogin prop).');
+        }
+
+          const eventName = 'af_loginscreen';
+          const eventValues = {
+            af_screenid: '1',
+            af_screenname: 'Login Screen',
+            af_deeplink: 'LoginScreen',
+          };
+
+          appsFlyer.logEvent(
+            eventName,
+            eventValues,
+            (res) => {
+              console.log(eventName + ' triggered ' + res);
+            },
+            (err) => {
+              console.error(err);
+            }
+          );
+
+        appsFlyer.setCustomerUserId(identifier, (res) => {
+          console.log('AppsFlyer ' + identifier + ' set:', res);
+        });
+
+        CleverTap.onUserLogin({'Identity': identifier});
+
+                CleverTap.recordEvent(
+                  'login_success', {
+                      'screen_id': 0,
+                      'screen_name': 'login'
+                  });
+
+        CleverTap.profileSet({'distinctID': identifier})
+
+        await setupMixpanel2(identifier, deviceID, isFirstLaunch);
+
+        navigation.reset({
+          index: 0,
+          routes: [{
+              name: 'MainTabs' ,
+              params: { identifier }
+          }],
+        });
+
+      } catch (e) {
+        Alert.alert('Login failed', e?.message || 'Unknown error');
+      }
+    };
+
+    async function setupMixpanel2(identifier, deviceID, isFirstLaunch) {
+      try {
+
+        if (deviceID) {
+            console.log("DeviceID: ", deviceID)
+            console.log("identifier: ", identifier)
+            console.log("isFirstLaunch:", isFirstLaunch);
+            if (isFirstLaunch) {
+                console.log("Alias")
+                mixpanel.alias(identifier, deviceID);
+                mixpanel.identify(identifier);
+            } else {
+                console.log("Not Alias")
+                mixpanel.identify(identifier);
+            }
+
+            mixpanel.getPeople().set({
+              Email: "",
+              Timestamp: new Date().toISOString(),
+            });
+
+            mixpanel.track("login_success", {});
+        }
+
+        appsFlyer.getAppsFlyerUID((error, appsFlyerId) => {
+          if (!error && appsFlyerId) {
+            console.log("AppsFlyer ID:", appsFlyerId);
+            mixpanel.people.set({ "AppsFlyer ID": appsFlyerId });
+          }
+        });
+
+      } catch (error) {
+        console.error("Mixpanel setup error:", error);
+      }
+    }
 
 /*
             const handleDeepLink = ({ url }) => {
@@ -586,11 +730,51 @@ const SignupScreen: React.FC<{ route: any,  navigation: any }> = ({ route, navig
         Alert.alert('Signup', 'Pretend signup successful (pass a real onSignup prop).');
       }
 
+      if (deviceID) {
+          console.log("DeviceID: ", deviceID)
+          console.log("identifier: ", identifier)
+          console.log("isFirstLaunch:", isFirstLaunch);
+          if (isFirstLaunch) {
+              console.log("Alias")
+              mixpanel.alias(identifier, deviceID);
+              mixpanel.identify(identifier);
+          } else {
+              console.log("Not Alias")
+              mixpanel.identify(identifier);
+          }
+
+          mixpanel.getPeople().set({
+              Email: "",
+              Timestamp: new Date().toISOString(),
+          });
+
+          mixpanel.track("signup_success", {});
+      }
+
       appsFlyer.setCustomerUserId(name, (res) => {
         console.log('AppsFlyer ' + name + ' set:', res);
       });
 
-      CleverTap.onUserLogin({'Name': 'Truc Test', 'Identity': name, 'Email': email});
+      let email = name + "@akadigital.vn"
+
+      const generateVietnamMobileNumber = () => {
+        const prefixes = ['32', '33', '34', '35', '36', '37', '38', '39',
+                          '56', '58',
+                          '70', '76', '77', '78', '79',
+                          '81', '82', '83', '84', '85',
+                          '86',
+                          '88', '89'];
+
+        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+
+        const randomDigits = Math.floor(1000000 + Math.random() * 9000000);
+
+        return `+84${prefix}${randomDigits}`;
+      };
+
+      CleverTap.onUserLogin({'Name': name, 'Identity': name, 'Email': email, 'Phone': generateVietnamMobileNumber()});
+
+      CleverTap.profileSet({'distinctID': name})
 
       CleverTap.recordEvent(
         'signup_success', {
@@ -752,6 +936,7 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
     (res) => console.log(eventName + ' triggered ' + res),
     (err) => console.error(err)
   );
+  mixpanel.track('home_screen');
 
   // --- Notification Detail inline screen ---
   const NotificationDetailScreen = ({ notification }) => (
@@ -910,6 +1095,7 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
                 (link) => setInviteLink(link),
                 (err) => console.log(err)
               );
+              mixpanel.track('generate_invitelink');
             }}
           >
             <Text style={tw`text-white text-center text-base font-semibold`}>
@@ -1044,6 +1230,8 @@ const PaymentsScreen: React.FC<{ navigation: any; route: any }> = ({
     (err) => console.error(err)
   );
 
+  mixpanel.track('payment_screen');
+
   const handleConfirm = () => {
     if (!accountNumber || !amount) {
       Alert.alert('Missing info', 'Please fill in all fields.');
@@ -1168,6 +1356,8 @@ const InsightsScreen: React.FC<{ navigation: any; route: any }> = ({
     (err) => console.error(err)
   );
 
+  mixpanel.track('insight_screen');
+
   const totalSpending = fakeInsights.reduce((sum, i) => sum + i.amount, 0);
 
   return (
@@ -1269,6 +1459,8 @@ const ProfileScreen: React.FC<{ navigation: any; route: any }> = ({
     (err) => console.error(err)
   );
 
+  mixpanel.track('profile_screen');
+
   // User Info State
   const [username, setUsername] = useState(displayUser);
   const [mobile, setMobile] = useState('0123456789');
@@ -1347,7 +1539,13 @@ const ProfileScreen: React.FC<{ navigation: any; route: any }> = ({
 
       <TouchableOpacity
         style={tw`flex-row items-center`}
-        onPress={() => navigation.navigate('LoginScreen')}
+        onPress={() => {
+            mixpanel.track('logout_success');
+
+            // clear local storage and generate new distinct_id
+            mixpanel.reset();
+            navigation.navigate('LoginScreen')
+        }}
       >
         <FontAwesome name="sign-out" size={24} color="#FF3B30" />
         <Text style={tw`ml-3 text-base text-red-600`}>Logout</Text>
