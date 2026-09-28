@@ -5,9 +5,10 @@ import ReactAppDependencyProvider
 import UserNotifications
 import CleverTapSDK
 import CleverTapReact
+import FirebaseCore
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate { // Thêm CleverTapURLDelegate ở đây
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate { 
   var window: UIWindow?
 
   var reactNativeDelegate: ReactNativeDelegate?
@@ -17,6 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    FirebaseApp.configure()
+    
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()

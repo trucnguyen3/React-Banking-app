@@ -31,7 +31,7 @@ import {
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import tw from 'twrnc';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { FontAwesome } from "@react-native-vector-icons/fontawesome";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import appsFlyer from 'react-native-appsflyer';
 const CleverTap = require('clevertap-react-native');
 
@@ -119,7 +119,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation, onLogin }) => 
             appId: '6754323492',
             onInstallConversionDataListener: true,
             onDeepLinkListener: true,
-            //timeToWaitForATTUserAuthorization: 10,
+            // timeToWaitForATTUserAuthorization: 10,
           },
           (result) => {
               console.log('AppsFlyer SDK initialized:', result)
@@ -774,7 +774,7 @@ const HomeScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
   const renderHomeContent = () => (
     <>
       {/* Header */}
-      <View style={tw`flex-row justify-between items-center px-5 pt-6`}>
+      <View style={tw`flex-row justify-between items-center px-5`}>
         <View>
           <Text style={tw`text-gray-500 text-base`}>Welcome back,</Text>
           <Text style={tw`text-2xl font-bold text-blue-700 mt-1`}>
@@ -1072,7 +1072,7 @@ const PaymentsScreen: React.FC<{ navigation: any; route: any }> = ({
   return (
     <ScrollView
       style={[tw`flex-1`, { backgroundColor: bg }]}
-      contentContainerStyle={tw`p-5`}
+      contentContainerStyle={tw`p-5 pt-12`}
       showsVerticalScrollIndicator={false}
     >
       <Text style={[tw`text-2xl font-bold mb-4`, { color: textColor }]}>
@@ -1173,7 +1173,7 @@ const InsightsScreen: React.FC<{ navigation: any; route: any }> = ({
   return (
     <ScrollView
       style={[tw`flex-1`, { backgroundColor: bg }]}
-      contentContainerStyle={tw`p-5`}
+      contentContainerStyle={tw`p-5 pt-12`}
     >
       <Text style={[tw`text-2xl font-bold mb-4`, { color: textColor }]}>
         Spending Insights
@@ -1284,8 +1284,29 @@ const ProfileScreen: React.FC<{ navigation: any; route: any }> = ({
     );
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'Are you sure you want to delete your account? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            console.log('Account deleted');
+            navigation.navigate('LoginScreen');
+          },
+        },
+      ]
+    );
+  };
+
   return (
-    <View style={[tw`flex-1 p-5`, backgroundStyle]}>
+    <View style={[tw`flex-1 p-5 pt-12`, backgroundStyle]}>
       <Text style={[tw`text-2xl font-bold mb-6`, { color: textColor }]}>
         Profile
       </Text>
@@ -1314,6 +1335,14 @@ const ProfileScreen: React.FC<{ navigation: any; route: any }> = ({
       >
         <FontAwesome name="users" size={22} color="#0066CC" />
         <Text style={tw`ml-3 text-base text-gray-700`}>Support</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={tw`flex-row items-center mb-4`}
+        onPress={handleDeleteAccount}
+      >
+        <FontAwesome name="trash-o" size={24} color="#FF3B30" />
+        <Text style={tw`ml-3 text-base text-red-600`}>Delete Account</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -1479,7 +1508,7 @@ const BillPaymentsScreen: React.FC<{ navigation: any; route: any }> = ({ navigat
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9FAFB', padding: 16 }}>
+    <View style={{ flex: 1, backgroundColor: '#F9FAFB', padding: 16, paddingTop: 50 }}>
       <Text style={{ fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 16 }}>
         My Payments
       </Text>
@@ -1575,7 +1604,7 @@ const HistoriesScreen: React.FC<{ navigation: any; route: any }> = ({ navigation
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9FAFB', padding: 16 }}>
+    <View style={{ flex: 1, backgroundColor: '#F9FAFB', padding: 16, paddingTop: 50 }}>
       <Text style={{ fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 16 }}>Transaction History</Text>
       <FlatList
         data={historyData}
@@ -1618,7 +1647,7 @@ const DepositScreen: React.FC<{ navigation: any; route: any }> = ({ navigation, 
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9FAFB', padding: 16, justifyContent: 'space-between' }}>
+    <View style={{ flex: 1, backgroundColor: '#F9FAFB', padding: 16, paddingTop: 50, justifyContent: 'space-between' }}>
       {/* Top Section */}
       <View>
         <Text style={{ fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 16 }}>
@@ -1699,7 +1728,7 @@ const CardApplyScreen = ({ navigation, route }) => {
   const [selected, setSelected] = useState<string | null>(null);
 
   return (
-    <View style={tw`flex-1 bg-gray-100 p-5`}>
+    <View style={tw`flex-1 bg-gray-100 p-5 p-12`}>
       <Text style={tw`text-2xl font-bold text-gray-900 mb-4`}>
         Select Card
       </Text>

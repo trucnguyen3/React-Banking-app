@@ -27,5 +27,7 @@
 		<key>NSExtensionPrincipalClass</key>
 		<string>CTNotificationServiceExtension</string>
 	</dict>
+	<key>RCTNewArchEnabled</key>
+	<true/>
 </dict>
 </plist>
