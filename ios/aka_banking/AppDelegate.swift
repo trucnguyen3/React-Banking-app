@@ -8,16 +8,57 @@ import CleverTapReact
 import FirebaseCore
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate { 
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
   var window: UIWindow?
 
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
+  
+  static var launchPushPayload: [AnyHashable: Any]? = nil
 
   func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    
+    // 1. XỬ LÝ KHI APP BỊ KILL HOÀN TOÀN (COLD START) QUA PUSH
+    if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+            print("📲 [AppDelegate] App launched from killed state via push: \(remoteNotification)")
+            AppDelegate.launchPushPayload = remoteNotification
+             
+            let castedDict = remoteNotification as? [String: Any] ?? [:]
+            
+            // Gọi đúng tên hàm chuẩn của CleverTap SDK iOS
+      CleverTap.sharedInstance()?.handleNotification(withData: castedDict)
+            
+            // Trích xuất wzrk_dl từ CleverTap payload
+            var deepLinkString: String? = nil
+            if let wzrkDl = castedDict["wzrk_dl"] as? String {
+                deepLinkString = wzrkDl
+            } else if let extras = castedDict["extras"] as? [String: Any], let wzrkDl = extras["wzrk_dl"] as? String {
+                deepLinkString = wzrkDl
+            }
+            
+            if let dl = deepLinkString, let url = URL(string: dl) {
+                print("🔗 [AppDelegate] Found DeepLink in Killed State: \(dl)")
+                
+                // Đợi React Native bridge & Linking module sẵn sàng rồi mới bắn URL để mở app
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    if UIApplication.shared.canOpenURL(url) {
+                        // Thao tác này sẽ tự động kích hoạt ngược lại hàm application(_:open:options:)
+                        // để chuyển tiếp qua RCTLinkingManager cho React Navigation xử lý
+                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    }
+                }
+            }
+
+            // Hiển thị Alert debug payload nếu cần thiết
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                let payloadString = "\(remoteNotification)"
+                self.showPushAlert(title: "Push Payload (Killed App)", message: payloadString)
+            }
+    }
+    
     FirebaseApp.configure()
     
     let delegate = ReactNativeDelegate()
@@ -35,15 +76,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
       launchOptions: launchOptions
     )
         
-
     CleverTap.setDebugLevel(CleverTapLogLevel.debug.rawValue + 1)
     CleverTap.autoIntegrate()
     CleverTapReactManager.sharedInstance()?.applicationDidLaunch(options: launchOptions)
     
     self.registerPush()
-//        for running notification in foreground
-    UNUserNotificationCenter.current().delegate = self
     
+    // Gán delegate để nhận sự kiện thông báo
+    UNUserNotificationCenter.current().delegate = self
     
     let action1 = UNNotificationAction(identifier: "action_1", title: "Back", options: [])
     let action2 = UNNotificationAction(identifier: "action_2", title: "Next", options: [])
@@ -56,23 +96,56 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     return true
   }
   
-  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void)
-      {
-          print("Push notification received in foreground.")
-          completionHandler([.alert, .badge, .sound])
+  // 2. XỬ LÝ KHI USER BẤM VÀO PUSH LÚC APP ĐANG Ở FOREGROUND / BACKGROUND
+  func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+      let userInfo = response.notification.request.content.userInfo as? [String: Any] ?? [:]
+      print("📲 [AppDelegate] User clicked notification (Active/Background): \(userInfo)")
+      
+      // Báo cho CleverTap SDK xử lý
+    CleverTap.sharedInstance()?.handleNotification(withData: userInfo)
+      
+      // Trích xuất và mở Deep Link
+      var deepLinkString: String? = nil
+      if let wzrkDl = userInfo["wzrk_dl"] as? String {
+          deepLinkString = wzrkDl
+      } else if let extras = userInfo["extras"] as? [String: Any], let wzrkDl = extras["wzrk_dl"] as? String {
+          deepLinkString = wzrkDl
       }
+      
+      if let dl = deepLinkString, let url = URL(string: dl) {
+          print("🔗 [AppDelegate] Opening DeepLink from background: \(dl)")
+          DispatchQueue.main.async {
+              if UIApplication.shared.canOpenURL(url) {
+                  UIApplication.shared.open(url, options: [:], completionHandler: nil)
+              }
+          }
+      }
+      
+      completionHandler()
+  }
   
+  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+      print("Push notification received in foreground.")
+      completionHandler([.alert, .badge, .sound])
+  }
+  
+  private func showPushAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default)
+        alertController.addAction(okAction)
+        
+        if let rootVC = self.window?.rootViewController {
+            rootVC.present(alertController, animated: true, completion: nil)
+        }
+    }
   
   private func registerPush() {
-          
-          // register category with actions
           let action1 = UNNotificationAction(identifier: "action_1", title: "Back", options: [])
           let action2 = UNNotificationAction(identifier: "action_2", title: "Next", options: [])
           let action3 = UNNotificationAction(identifier: "action_3", title: "View In App", options: [])
           let category = UNNotificationCategory(identifier: "CTNotification", actions: [action1, action2, action3], intentIdentifiers: [], options: [])
           UNUserNotificationCenter.current().setNotificationCategories([category])
           
-          // request permissions
           UNUserNotificationCenter.current().requestAuthorization(options: [.sound, .alert, .badge]) {
               (granted, error) in
               if (granted) {
@@ -97,7 +170,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
           DispatchQueue.main.async {
               self.showAlert(message: "APPDELEGATE: open url \(url) with completionHandler")
           }
-          
           completion?(false)
       }
       
@@ -114,27 +186,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
           self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
       }
       
-      func applicationWillResignActive(_ application: UIApplication) {
-          // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-          // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-      }
-      
-      func applicationDidEnterBackground(_ application: UIApplication) {
-          // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-          // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-      }
-      
-      func applicationWillEnterForeground(_ application: UIApplication) {
-          // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-      }
-      
-      func applicationDidBecomeActive(_ application: UIApplication) {
-          // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-      }
-      
-      func applicationWillTerminate(_ application: UIApplication) {
-          // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-      }
+      func applicationWillResignActive(_ application: UIApplication) {}
+      func applicationDidEnterBackground(_ application: UIApplication) {}
+      func applicationWillEnterForeground(_ application: UIApplication) {}
+      func applicationDidBecomeActive(_ application: UIApplication) {}
+      func applicationWillTerminate(_ application: UIApplication) {}
 }
 
 class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {

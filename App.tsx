@@ -1,5 +1,7 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { Linking } from 'react-native';
+
+import { NavigationContainer, LinkingOptions, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { RootStackParamList } from './src/types/navigation';
@@ -27,6 +29,7 @@ import CardScanNidScreen from './src/screens/CardScanNidScreen';
 import CardConfirmNidScreen from './src/screens/CardConfirmNidScreen';
 
 import appsFlyer from 'react-native-appsflyer';
+const CleverTap = require('clevertap-react-native');
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -45,10 +48,106 @@ appsFlyer.initSdk(
   (error) => console.error('AppsFlyer error:', error)
 );
 
+const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: [
+    'aka://banking',
+    'https://uat1.akadigital.net',
+  ],
+  config: {
+    screens: {
+      WelcomeScreen: 'welcome',
+      LoginScreen: 'login',
+      PhoneInputScreen: 'phone-input',
+      OtpVerifyScreen: 'otp-verify',
+      FaceIdScreen: 'face-id',
+      SignupNidScreen: 'signup-nid',
+      SignupFormScreen: 'signup-form',
+      ConfirmInfoScreen: 'confirm-info',
+      WaitingReviewScreen: 'waiting-review',
+      SuccessScreen: 'success',
+      BillPaymentsScreen: 'bill-payments',
+      HistoriesScreen: 'histories',
+      DepositScreen: 'deposit',
+      CardApplyScreen: 'card-apply',
+      CardOtpScreen: 'card-otp',
+      CardFaceIdScreen: 'card-face-id',
+      CardConfirmInfoScreen: 'card-confirm-info',
+      CardReviewContractScreen: 'card-review-contract',
+      CardSuccessScreen: 'card-success',
+      CardScanNidScreen: 'card-scan-nid',
+      CardConfirmNidScreen: 'card-confirm-nid',
+      MainTabs: {
+        screens: {
+          Home: 'home',
+        },
+      },
+    },
+  } as any, // Ép kiểu để bypass lỗi check type gắt gao của TypeScript với Tab Navigator
+};
+
+export const navigationRef = createNavigationContainerRef();
+
+export function navigateWhenReady(screenName: string, params?: any) {
+  const interval = setInterval(() => {
+    if (navigationRef.isReady()) {
+      clearInterval(interval);
+      navigationRef.navigate(screenName as never, params as never);
+    }
+  }, 100); // Đợi tới khi Navigation Container sẵn sàng thì chuyển màn hình
+}
 
 const App: React.FC = () => {
+
+  useEffect(() => {
+    // Hàm xử lý chung khi lấy được deeplink từ push hoặc url
+    const handleDeepLink = (deepLink?: string) => {
+      if (!deepLink) return;
+      console.log("🚀 Processing Deeplink:", deepLink);
+      
+      try {
+        // Loại bỏ query params (nếu có) bằng cách cắt từ dấu '?'
+        const cleanUrl = deepLink.split('?')[0];
+        // Chia nhỏ đường dẫn theo dấu '/'
+        const segments = cleanUrl.split('/').filter(Boolean); 
+        // Lấy phần tử cuối cùng (ví dụ: CardApplyScreen hoặc card-apply)
+        const targetScreen = segments[segments.length - 1];
+
+        if (targetScreen) {
+          console.log("🧭 Target Screen/Path:", targetScreen);
+          
+          // Map trực tiếp với màn hình tương ứng
+          if (targetScreen.toLowerCase().includes('cardapply') || targetScreen.toLowerCase().includes('card-apply')) {
+            navigateWhenReady('CardApplyScreen');
+          }
+          // Bạn có thể thêm các màn hình khác ở đây nếu cần
+        }
+      } catch (e) {
+        console.error("❌ Error parsing DeepLink:", e);
+      }
+    };
+
+    // 1. Lắng nghe khi app đang chạy (Foreground / Background)
+    const pushListener = CleverTap.addListener(CleverTap.CleverTapPushNotificationClicked, (event: any) => {
+      console.log("📥 Push Clicked Event:", event);
+      const deepLink = event?.wzrk_dl || event?.pt_dl1 || event?.extras?.wzrk_dl;
+      handleDeepLink(deepLink);
+    });
+
+    // 2. Xử lý trường hợp App bị KILL hoàn toàn (Cold Start)
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        console.log("🚀 App opened from Killed state via Linking URL:", url);
+        handleDeepLink(url);
+      }
+    }).catch(err => console.error("Error getting initial URL:", err));
+
+    return () => {
+      pushListener.remove();
+    };
+  }, []);
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef} linking={linking}>
       <Stack.Navigator initialRouteName="WelcomeScreen" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
